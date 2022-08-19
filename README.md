@@ -22,12 +22,7 @@ yarn install
 
 # Como correr el script
 
-Para iniciar el scrip basta con:
-```
-npm run start
-```
-
-La primera vez que ejecutemos el script, este mostrara el codigo QR en la terminal. Deberemos agregar de escanear el codigo QR con nuestro Whatsapp (Como cuando accedemos a Whatsapp web).
+La primera vez que ejecutemos el script, este mostrara el codigo QR en la terminal. Deberemos de escanear el codigo QR con nuestro Whatsapp (Como cuando accedemos a Whatsapp web).
 
 Tambien, es necesario asegurarnos que la data es correcta, al inicio de `index.js` esta definidas las variables que necesitamos para correr el script:
 
@@ -36,6 +31,11 @@ const GROUP_NAME = "Novios FDS 211"; // Pedir a la pareja nacional que cree el g
 const WAIT_TIME_BEFORE_EACH_INVITE = 5000; //Esperar 5 segundos antes de agregar a cada participante
 const SENDER_NAME = "Cesar Bonilla";
 const NUMBER_LIST = [""]; //Lista de numeros como strings sin el 504
+```
+
+Para iniciar el scrip basta con:
+```
+npm run start
 ```
 
 # Mejoras a Futuro
