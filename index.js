@@ -1,28 +1,41 @@
+const yargs = require('yargs/yargs')(process.argv.slice(2));
 const qrcode = require("qrcode-terminal");
-const { Client, LocalAuth, GroupChat } = require("whatsapp-web.js");
+const { Client } = require("whatsapp-web.js");
+const path = require('path');
 
-const GROUP_NAME = "Novios FDS 211"; // Pedir a la pareja nacional que cree el grupo con las parejas equipo
 const WAIT_TIME_BEFORE_EACH_INVITE = 5000; //Esperar 5 segundos antes de agregar a cada participante
 const SENDER_NAME = "Cesar Bonilla";
-const NUMBER_LIST = [""]; //Lista de numeros como strings sin el 504
+const NUMBER_LIST = require('./phoneNumbers'); //Lista de numeros como strings sin el 504
+
+const argv = yargs.demandOption(['nombre-grupo']).argv;
 
 const client = new Client({
-  authStrategy: new LocalAuth(),
+  puppeteer: {
+    userDataDir: path.resolve(__dirname, './userData'),
+  }
 });
 
 client.on("qr", (qr) => {
   qrcode.generate(qr, { small: true });
 });
 
+client.on('authenticated', () => {
+  console.log('Auth fue correcta');
+})
+
+client.on('auth_failure', (message) => {
+  console.error(message);
+})
+
 client.on("ready", async () => {
   console.log("Client is ready!");
   const chats = await client.getChats();
   const groupFDSNovios = chats.find((chat) => {
-    return chat.name === GROUP_NAME;
+    return chat.name === argv.nombreGrupo;
   });
 
   if (!groupFDSNovios || !groupFDSNovios.isGroup) {
-    throw new Error(`No se encontro el grupo con el nombre ${GROUP_NAME}`);
+    throw new Error(`No se encontro el grupo con el nombre ${argv.nombreGrupo}`);
   }
 
   const userIdsToAdd = NUMBER_LIST.map((userNumber) => `504${userNumber}@c.us`);
@@ -51,9 +64,11 @@ client.on("ready", async () => {
         if (result[participantId] === 403) {
           retriableUserIds.push(participantId);
         }
+        break;
       }
       case 400: {
         failedUserIds.push(participantId);
+        break;
       }
     }
     await sleep(WAIT_TIME_BEFORE_EACH_INVITE);
@@ -77,6 +92,7 @@ client.on("ready", async () => {
     const contact = await client.getContactById(participantId);
     const chat = await contact.getChat();
     console.log("Sending message to", participantId);
+    console.log(chat)
     await chat.sendMessage(
       `Hola, buen dia. Le saluda ${SENDER_NAME} del encuentro catolico para novios. Hemos creado un grupo de Whatsapp, por el cual se estara enviando informacion pertinente a las charlas. Puede unirse al grupo usando el enlance: ${inviteLink}`
     );

@@ -4,10 +4,14 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "eslint": "^8.25.0",
     "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "^1.17.1"
+    "whatsapp-web.js": "1.16.4-alpha.0",
+    "yargs": "^17.6.0"
   },
   "scripts": {
-    "start": "node index.js"
+    "prestart": "yarn lint",
+    "start": "node index.js",
+    "lint": "eslint *.js"
   }
 }
