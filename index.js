@@ -29,6 +29,7 @@ client.on('auth_failure', (message) => {
 
 client.on("ready", async () => {
   console.log("Client is ready!");
+  console.log(`Se tratara de agregar ${NUMBER_LIST.length} numeros`);
   const chats = await client.getChats();
   const groupFDSNovios = chats.find((chat) => {
     return chat.name === argv.nombreGrupo;
@@ -40,7 +41,9 @@ client.on("ready", async () => {
 
   const userIdsToAdd = NUMBER_LIST.map((userNumber) => `504${userNumber}@c.us`);
 
-  const existingUserIds = groupFDSNovios.groupMetadata.participants.map(
+  console.log(groupFDSNovios.participants);
+
+  const existingUserIds = groupFDSNovios.participants.map(
     (participant) => participant.id._serialized
   );
 
@@ -57,11 +60,15 @@ client.on("ready", async () => {
 
   const retriableUserIds = [];
   const failedUserIds = [];
+
+  console.log(`Agregando ${userIdsThatAreNotInTheGroup.length} participantes...`);
+
   for await (const participantId of userIdsThatAreNotInTheGroup) {
     const result = await groupFDSNovios.addParticipants([participantId]);
+    console.log(JSON.stringify(result, null, '\t'));
     switch (result.status) {
       case 207: {
-        if (result[participantId] === 403) {
+        if (result.participants[0]?.code == 403) {
           retriableUserIds.push(participantId);
         }
         break;
@@ -82,6 +89,7 @@ client.on("ready", async () => {
   console.log(
     "Algunos participantes no se agregaron correctamente, se les enviaran un mensaje con el enlace para unirse al grupo..."
   );
+  console.log(retriableUserIds);
 
   const inviteCode = await groupFDSNovios.getInviteCode();
   const inviteLink = `https://chat.whatsapp.com/${inviteCode}`;
@@ -91,7 +99,7 @@ client.on("ready", async () => {
   for await (const participantId of retriableUserIds) {
     const contact = await client.getContactById(participantId);
     const chat = await contact.getChat();
-    console.log("Sending message to", participantId);
+    console.log("Enviando mensaje a", participantId);
     console.log(chat)
     await chat.sendMessage(
       `Hola, buen dia. Le saluda ${SENDER_NAME} del encuentro catolico para novios. Hemos creado un grupo de Whatsapp, por el cual se estara enviando informacion pertinente a las charlas. Puede unirse al grupo usando el enlance: ${inviteLink}`
@@ -99,7 +107,14 @@ client.on("ready", async () => {
   }
 
   console.log("Finalizado!");
+  if (failedUserIds.length > 0) {
+    logFailedUserIds(failedUserIds);
+  }
   process.exit(0);
+
+  function logFailedUserIds(numbers) {
+    console.log('No se pudo agregar estos numeros:', numbers);
+  }
 });
 
 client.initialize();
