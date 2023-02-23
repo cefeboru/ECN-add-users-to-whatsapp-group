@@ -27,17 +27,24 @@ La primera vez que ejecutemos el script, este mostrara el codigo QR en la termin
 Tambien, es necesario asegurarnos que la data es correcta, al inicio de `index.js` esta definidas las variables que necesitamos para correr el script:
 
 ```javascript
-const GROUP_NAME = "Novios FDS 211"; // Pedir a la pareja nacional que cree el grupo con las parejas equipo
-const WAIT_TIME_BEFORE_EACH_INVITE = 5000; //Esperar 5 segundos antes de agregar a cada participante
+const WAIT_TIME_BEFORE_EACH_INVITE = 5000; // Esperar 5 segundos antes de agregar a cada participante
 const SENDER_NAME = "Cesar Bonilla";
-const NUMBER_LIST = [""]; //Lista de numeros como strings sin el 504
 ```
 
-Para iniciar el scrip basta con:
-```
-npm run start
+## Numeros telefonicos
+Agregar los numeros telefonicos en el archivo `phoneNumbers.js`. Ejemplo:
+
+```js
+module.exports = [
+    "32807873",
+    "99980705"
+];
 ```
 
-# Mejoras a Futuro
+## Iniciar el script
+```
+npm run start --nombre-grupo="Novios FDS XXX"
+```
+Pedir a la pareja nacional que cree el grupo con las parejas equipo (o crearlo ustedes y agregar a las parejas equipo), donde XXX es el numero de FDS. 
 
-- Convertir a CLI y requerir la data como parametros
+Nota: El grupo debe de existir antes de correr el script.
